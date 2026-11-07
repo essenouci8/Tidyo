@@ -10,7 +10,8 @@
   const sessions = [{ id: 1, time: Date.now() - 86400000, moved: 340, renamed: 120, deleted: 85, undone: false, active: 545, inTrash: 85, trashBytes: 671088640 }];
   const handlers = {
     init: async () => ({ hasKey, storage: true }),
-    validateKey: async (a) => { await sleep(700); if (a.key.startsWith('AIza')) { hasKey = true; localStorage.setItem('mockKey', '1'); return { ok: true }; } const e = new Error('bad'); e.kind = 'BAD_KEY'; throw e; },
+    validateKey: async (a) => { await sleep(700); if (a.key.startsWith('AIza')) { hasKey = true; localStorage.setItem('mockKey', '1'); return { ok: true, provider: 'OpenAI', model: 'gpt-4o-mini' }; } const e = new Error('bad'); e.kind = 'BAD_KEY'; throw e; },
+    status: async () => ({ provider: 'OpenAI', model: 'gpt-4o-mini', vision: true }),
     clearKey: async () => { hasKey = false; localStorage.removeItem('mockKey'); return { ok: true }; },
     storageGranted: async () => ({ granted: true }),
     scan: async () => {

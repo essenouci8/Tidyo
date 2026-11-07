@@ -10,7 +10,7 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
-/** Stores small secrets (the Gemini key) encrypted with an Android Keystore key. */
+/** Stores small secrets (the AI key) encrypted with an Android Keystore key. */
 class Secrets(ctx: Context) {
     private val prefs = ctx.getSharedPreferences("tidyo_secure", Context.MODE_PRIVATE)
     private val alias = "tidyo_secret_key_v1"
@@ -30,14 +30,21 @@ class Secrets(ctx: Context) {
     }
 
     fun put(name: String, value: String) {
-        val c = Cipher.getInstance("AES/GCM/NoPadding")
-        c.init(Cipher.ENCRYPT_MODE, key())
-        val out = c.iv + c.doFinal(value.toByteArray(Charsets.UTF_8))
-        prefs.edit().putString(name, Base64.encodeToString(out, Base64.NO_WRAP)).apply()
+        try {
+            val c = Cipher.getInstance("AES/GCM/NoPadding")
+            c.init(Cipher.ENCRYPT_MODE, key())
+            val out = c.iv + c.doFinal(value.toByteArray(Charsets.UTF_8))
+            prefs.edit().putString(name, "e:" + Base64.encodeToString(out, Base64.NO_WRAP)).apply()
+        } catch (e: Exception) {
+            // Some devices have a broken Keystore: fall back to the app's private storage.
+            prefs.edit().putString(name, "p:" + Base64.encodeToString(value.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)).apply()
+        }
     }
 
     fun get(name: String): String? {
-        val raw = prefs.getString(name, null) ?: return null
+        val stored = prefs.getString(name, null) ?: return null
+        if (stored.startsWith("p:")) return try { String(Base64.decode(stored.substring(2), Base64.NO_WRAP), Charsets.UTF_8) } catch (e: Exception) { null }
+        val raw = stored.removePrefix("e:")
         return try {
             val bytes = Base64.decode(raw, Base64.NO_WRAP)
             val c = Cipher.getInstance("AES/GCM/NoPadding")

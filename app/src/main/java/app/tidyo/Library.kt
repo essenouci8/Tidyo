@@ -99,7 +99,8 @@ object Library {
                     val h = hash(r.file, Long.MAX_VALUE) ?: continue
                     full.getOrPut(h) { ArrayList() }.add(r)
                 }
-                full.values.filter { it.size > 1 }.forEach { dups.add(it) }
+                full.values.map { grp -> grp.filter { !it.rel.startsWith("Android/") && !isChat(it) } }
+                    .filter { it.size > 1 }.forEach { dups.add(it) }
             }
             emit("scan", JSONObject().put("phase", "dupes").put("n", hashed).put("total", toHash))
         }

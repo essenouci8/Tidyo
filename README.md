@@ -1,6 +1,6 @@
 # Tidyo
 
-AI file manager for Android. It reads your files' names and dates, asks Gemini (with **your own API key**) how to tidy them, shows the plan as a receipt, applies it, and lets you undo everything for 30 days.
+AI file manager for Android. It reads your files' names and dates, asks your AI provider (with **your own API key (Gemini, OpenAI, Claude, Groq, OpenRouter, xAI, Mistral or DeepSeek, detected automatically)**) how to tidy them, shows the plan as a receipt, applies it, and lets you undo everything for 30 days.
 
 - **UI**: the exact screens from `design/` (HTML/CSS + animations) hosted in a WebView — `app/src/main/assets/www`.
 - **Native layer** (Kotlin): Gemini client, file scan, duplicate detection, plan, apply/undo, 30-day trash — `app/src/main/java/app/tidyo`.

@@ -151,7 +151,7 @@ input, textarea { -webkit-user-select: text; user-select: text; }
 .item button { min-height: 44px; border: 3px solid #0E0E0E; border-radius: 0; background: #FFD23F; color: #0E0E0E; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; padding: 0 10px; cursor: pointer; }
 .item .x { background: #FFFFFF; min-width: 44px; padding: 0; font-size: 18px; }
 .empty { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: #4A463E; padding: 8px 2px; }
-#toast { position: fixed; z-index: 60; left: 22px; right: 22px; bottom: 28px; display: none; background: #0E0E0E; color: #FFD23F; border: 3px solid #0E0E0E; padding: 10px 12px; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; }
+#toast { position: fixed; z-index: 60; left: 22px; right: 22px; top: 54px; display: none; background: #0E0E0E; color: #FFD23F; border: 3px solid #0E0E0E; padding: 10px 12px; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; }
 #toast.on { display: block; }
 
 @media (prefers-reduced-motion: reduce) {

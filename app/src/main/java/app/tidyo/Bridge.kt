@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class Bridge(private val activity: MainActivity) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val secrets = Secrets(activity)
-    private val gemini = Gemini(secrets)
+    private val llm = Llm(secrets)
     private val exec = Executor(activity)
     private val paused = AtomicBoolean(false)
     private var job: Job? = null
@@ -42,7 +42,7 @@ class Bridge(private val activity: MainActivity) {
             reply(id, false, JSONObject().put("kind", "CANCELLED").put("message", "cancelled"))
             return
         }
-        val kind = (e as? GeminiException)?.kind?.name ?: "OTHER"
+        val kind = (e as? LlmException)?.kind?.name ?: "OTHER"
         reply(id, false, JSONObject().put("kind", kind).put("message", e.message ?: e.javaClass.simpleName))
     }
 
@@ -63,13 +63,15 @@ class Bridge(private val activity: MainActivity) {
     private suspend fun handle(method: String, a: JSONObject): JSONObject = when (method) {
         "init" -> {
             withContext(Dispatchers.IO) { exec.purgeOld() }
-            JSONObject().put("hasKey", gemini.hasKey()).put("storage", storageGranted())
+            JSONObject().put("hasKey", llm.hasKey()).put("storage", storageGranted())
+                .put("provider", llm.providerLabel()).put("model", llm.modelLabel())
         }
         "validateKey" -> {
-            withContext(Dispatchers.IO) { gemini.validate(a.getString("key").trim()) }
-            JSONObject().put("ok", true)
+            val p = withContext(Dispatchers.IO) { llm.validate(a.getString("key").trim()) }
+            JSONObject().put("ok", true).put("provider", p.label).put("model", llm.modelLabel())
         }
-        "clearKey" -> { gemini.clearKey(); JSONObject().put("ok", true) }
+        "status" -> JSONObject().put("provider", llm.providerLabel()).put("model", llm.modelLabel()).put("vision", llm.vision)
+        "clearKey" -> { llm.clearKey(); JSONObject().put("ok", true) }
         "storageGranted" -> JSONObject().put("granted", storageGranted())
         "requestStorage" -> { requestStorage(); JSONObject().put("ok", true) }
         "scan" -> {
@@ -81,7 +83,7 @@ class Bridge(private val activity: MainActivity) {
         "plan" -> {
             paused.set(false)
             val rules = a.optJSONArray("rules") ?: JSONArray()
-            Planner.build(gemini, (0 until rules.length()).map { rules.getString(it) }, { paused.get() }) { n, d -> emit(n, d) }
+            Planner.build(llm, (0 until rules.length()).map { rules.getString(it) }, { paused.get() }) { n, d -> emit(n, d) }
         }
         "apply" -> {
             val idsArr = a.getJSONArray("ids")
@@ -147,7 +149,7 @@ class Bridge(private val activity: MainActivity) {
 Return ONLY JSON: {"ok":true,"instruction":"<one clear imperative sentence a file-organizing AI can follow, with folder names and time thresholds>","chips":[{"t":"text","v":"when a"},{"t":"chip","v":"PDF"},{"t":"text","v":"mentions"},{"t":"chip","v":"electricity"}, ...]}
 The chips array re-tells the rule as a short sentence in English. Use {"t":"chip"} for the key entities (file type, keyword, destination folder, naming scheme, time threshold) and {"t":"text"} for the connecting words. At most 12 items, chips short (1-2 words, keep file types uppercase).
 If the text is not a file organizing rule, return {"ok":false}."""
-        val out = gemini.generate(sys, JSONArray().put(JSONObject().put("text", text)), 0.1)
-        return Gemini.parseJson(out) ?: JSONObject().put("ok", false)
+        val out = llm.generate(sys, JSONArray().put(JSONObject().put("text", text)), 0.1)
+        return Llm.parseJson(out) ?: JSONObject().put("ok", false)
     }
 }

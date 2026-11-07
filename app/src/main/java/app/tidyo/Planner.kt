@@ -44,7 +44,7 @@ Return ONLY JSON: {"items":[{"id":<int>,"name":"...","folder":"..."}]}
 Omit an item if you cannot tell what it is. Do not invent details such as places or people's names unless they are clearly visible."""
 
     suspend fun build(
-        gemini: Gemini,
+        llm: Llm,
         rules: List<String>,
         paused: () -> Boolean,
         emit: (String, JSONObject) -> Unit
@@ -63,23 +63,27 @@ Omit an item if you cannot tell what it is. Do not invent details such as places
         }
 
         // Candidates the AI should look at.
-        val cands = lib.files.filter { it.id !in items && (lib.isUnsorted(it) || lib.isBadName(it) || lib.isScreenshot(it) || lib.isChat(it)) }
+        val cands = lib.files.filter {
+            it.id !in items && (!it.rel.startsWith("Android/") || lib.isChat(it)) &&
+                (lib.isUnsorted(it) || lib.isBadName(it) || lib.isScreenshot(it) || lib.isChat(it))
+        }
             .sortedWith(compareBy({ if (lib.isUnsorted(it)) 0 else 1 }, { -it.mtime }))
             .take(1200)
 
         val imgExt = setOf("jpg", "jpeg", "png", "webp")
-        val vision = cands.filter {
+        val vision = if (!llm.vision) emptyList() else cands.filter {
             lib.isBadName(it) && !lib.isScreenshot(it) && !lib.isChat(it) &&
                 (it.ext in imgExt || it.ext == "pdf") && it.size in 1..(20L * 1024 * 1024)
         }.take(48)
         val visionIds = vision.map { it.id }.toHashSet()
         val nameOnly = cands.filter { it.id !in visionIds }
 
-        val batches1 = nameOnly.chunked(250)
+        val batches1 = nameOnly.chunked(llm.batch)
         val batches2 = vision.chunked(6)
         val totalCalls = batches1.size + batches2.size
         var doneCalls = 0
         var processed = 0
+        var partial: String? = null
         val totalFiles = nameOnly.size + vision.size
         fun tick() {
             emit(
@@ -97,8 +101,13 @@ Omit an item if you cannot tell what it is. Do not invent details such as places
             while (paused()) delay(150)
             val sb = StringBuilder()
             for (r in b) sb.append("${r.id}|${r.rel}|${r.size / 1024}|${(now - r.mtime) / 86_400_000}\n")
-            val text = gemini.generate(sys1, JSONArray().put(JSONObject().put("text", sb.toString())))
-            val arr = Gemini.parseJson(text)?.optJSONArray("actions")
+            val text = try {
+                llm.generate(sys1, JSONArray().put(JSONObject().put("text", sb.toString())))
+            } catch (e: LlmException) {
+                if (e.kind == LlmException.Kind.BAD_KEY || items.isEmpty()) throw e
+                partial = e.message; break
+            }
+            val arr = Llm.parseJson(text)?.optJSONArray("actions")
             if (arr != null) for (i in 0 until arr.length()) {
                 val a = arr.optJSONObject(i) ?: continue
                 val r = lib.byId[a.optInt("id", -1)] ?: continue
@@ -119,9 +128,16 @@ Omit an item if you cannot tell what it is. Do not invent details such as places
                 parts.put(JSONObject().put("text", "Item id ${r.id} (current name: ${r.name})"))
                 parts.put(JSONObject().put("inlineData", JSONObject().put("mimeType", "image/jpeg").put("data", jpeg)))
             }
-            if (any) {
-                val text = gemini.generate(sys2, parts, 0.3)
-                val arr = Gemini.parseJson(text)?.optJSONArray("items")
+            if (any && partial == null) {
+                val text = try {
+                    llm.generate(sys2, parts, 0.3)
+                } catch (e: LlmException) {
+                    // Images are a bonus: if this model can't take them, carry on without.
+                    if (e.kind == LlmException.Kind.BAD_KEY || e.kind == LlmException.Kind.NETWORK) throw e
+                    if (e.kind == LlmException.Kind.QUOTA) partial = e.message
+                    ""
+                }
+                val arr = Llm.parseJson(text)?.optJSONArray("items")
                 if (arr != null) for (i in 0 until arr.length()) {
                     val a = arr.optJSONObject(i) ?: continue
                     val r = lib.byId[a.optInt("id", -1)] ?: continue
@@ -136,7 +152,7 @@ Omit an item if you cannot tell what it is. Do not invent details such as places
 
         current = items.values.toList()
         planId = (planId + 1)
-        return planJson()
+        return planJson().put("partial", partial ?: JSONObject.NULL)
     }
 
     fun planJson(): JSONObject {

@@ -72,15 +72,15 @@ const dateText = (ms) => new Date(ms).toLocaleDateString('en-US', { month: 'shor
 /* ---------- error handling ---------- */
 function explain(e) {
   switch (e.kind) {
-    case 'NETWORK': return 'No internet. Tidyo needs it to talk to Gemini.';
-    case 'QUOTA': return "Gemini's free limit is full for now. Try again in a minute.";
-    case 'BAD_KEY': return 'Gemini stopped accepting your key.';
+    case 'NETWORK': return 'No internet. Tidyo needs it to reach your AI provider.';
+    case 'QUOTA': return (e.message && e.message.length < 140 ? e.message + ' ' : '') + 'Wait a minute, or check the credit on your key.';
+    case 'BAD_KEY': return 'Your AI provider stopped accepting the key.';
     default: return 'Something went wrong: ' + (e.message || '').slice(0, 120);
   }
 }
 
 /* ---------- state ---------- */
-const S = { stats: null, plan: null, level: store.get('level', 1), mode: 'scan', names: [], t0: 0 };
+const S = { provider: '', stats: null, plan: null, level: store.get('level', 1), mode: 'scan', names: [], t0: 0 };
 const DEFAULT_RULES = [
   { id: 1, text: 'screenshots older than 30 days → trash', instruction: 'Move screenshots older than 30 days to trash.', enabled: true },
   { id: 2, text: 'sort downloads by type', instruction: "Sort files in the Download folder into folders by type (Documents, Pictures, Videos, Audio, Archives, Apps).", enabled: true },
@@ -98,11 +98,12 @@ function bindSetup() {
     if (!key) return fail('PASTE A KEY FIRST.');
     btn.disabled = true; label.textContent = 'checking…';
     try {
-      await call('validateKey', { key });
+      const v = await call('validateKey', { key });
+      S.provider = v.provider; toast('Connected to ' + v.provider + ' · ' + v.model, 2500);
       input.value = ''; root.classList.remove('failed'); input.removeAttribute('aria-invalid');
       await startAfterKey();
     } catch (e) {
-      fail({ NETWORK: 'NO INTERNET. TRY AGAIN.', QUOTA: 'KEY OK, BUT RATE-LIMITED. WAIT A MINUTE.', OTHER: 'GOOGLE SAID NO. TRY AGAIN.' }[e.kind] || "NOPE. THAT KEY DIDN'T WORK.");
+      fail({ NETWORK: 'NO INTERNET. TRY AGAIN.', QUOTA: 'KEY OK, BUT RATE-LIMITED. WAIT A MINUTE.', OTHER: 'COULDN\'T CHECK IT. TRY AGAIN.' }[e.kind] || "NOPE. THAT KEY DIDN'T WORK.");
     } finally { btn.disabled = false; label.textContent = 'check key'; }
   }
   function fail(msg) {
@@ -115,20 +116,18 @@ function bindSetup() {
 }
 
 async function waitForStorage() {
-  if ((await call('storageGranted')).granted) return;
-  modal({ title: 'let me in.', text: 'Tidyo needs "all files access" to sort, rename and delete files. Tap the button, switch it on for Tidyo, then come back.', yes: 'open settings' }).then(() => call('requestStorage'));
-  await new Promise((resolve) => {
-    const check = async () => { if ((await call('storageGranted')).granted) { $('#modal').classList.remove('on'); delete listeners.resume; clearInterval(iv); resolve(); } };
-    const iv = setInterval(check, 1500);
-    on('resume', check);
-  });
+  while (!(await call('storageGranted')).granted) {
+    await modal({ title: 'let me in.', text: 'Tidyo needs "all files access" to sort, rename and delete files. Tap the button, switch it on for Tidyo, then come back.', yes: 'open settings' });
+    await call('requestStorage');
+    await new Promise((resolve) => { on('resume', () => { delete listeners.resume; resolve(); }); });
+  }
 }
 async function startAfterKey() { await waitForStorage(); await runScan(); }
 
 /* ---------- scan / plan / apply progress (one screen, four moods) ---------- */
 const MODES = {
   scan: { state: 'SCANNING', note: 'Reading file names and dates on this phone. Nothing leaves it in this step.', pause: 'pause scan' },
-  plan: { state: 'THINKING', note: "Paced to fit Gemini's free limit, so big folders take a few extra minutes.", pause: 'pause' },
+  plan: { state: 'THINKING', note: "Paced to fit your key's rate limit, so big folders take a few extra minutes.", pause: 'pause' },
   apply: { state: 'TIDYING', note: 'Moving files carefully. Anything deleted waits in trash for 30 days.', pause: null },
 };
 function setProgress(p, n, ofText, stickers) {
@@ -173,7 +172,7 @@ function bindProgress() {
     else setProgress(0.7 + 0.3 * (d.n / Math.max(1, d.total)), S.lastTotal || 0, 'checking for twins…', ['hunting twins', 'comparing files', 'hashing…']);
     if (d.phase === 'read') S.lastTotal = d.total;
   });
-  on('plan', (d) => setProgress(d.total ? d.n / d.total : 1, d.n, 'of ' + num(d.total) + ' files looked at', [num(d.n) + ' looked at', 'asking Gemini', d.callsLeft + ' requests left…']));
+  on('plan', (d) => setProgress(d.total ? d.n / d.total : 1, d.n, 'of ' + num(d.total) + ' files looked at', [num(d.n) + ' looked at', 'asking ' + (S.provider || 'AI'), d.callsLeft + ' requests left…']));
   on('apply', (d) => setProgress(d.total ? d.n / d.total : 1, d.n, 'of ' + num(d.total) + ' changes made', [num(d.n) + ' done', 'making folders', 'tidying…']));
 }
 
@@ -209,7 +208,10 @@ function setLevel(i) {
 function bindHome() {
   $$('#s-home [data-lv]').forEach((b) => { b.onclick = () => setLevel(Number(b.dataset.lv)); });
   $('#btn-plan').onclick = makePlan;
-  $('#btn-settings').onclick = () => $('#settings').classList.add('on');
+  $('#btn-settings').onclick = async () => {
+    try { const st = await call('status'); $('#set-p').textContent = 'Connected to ' + st.provider + ' (' + st.model + '). Your key is stored encrypted on this phone.'; } catch (e) { /* ignore */ }
+    $('#settings').classList.add('on');
+  };
   $('#set-close').onclick = () => $('#settings').classList.remove('on');
   $('#set-key').onclick = async () => { $('#settings').classList.remove('on'); await call('clearKey'); go('setup'); };
   const q = $('#q');
@@ -246,7 +248,8 @@ async function makePlan() {
     else toast(explain(e), 5000);
     return;
   }
-  if (!S.plan.items.length) { toast("nothing to tidy. you're clean."); go('home'); return; }
+  if (!S.plan.items.length) { toast(S.plan.partial ? explain({ kind: 'QUOTA', message: S.plan.partial }) : "nothing to tidy. you're clean.", 5000); go('home'); return; }
+  if (S.plan.partial) toast('Stopped early (' + String(S.plan.partial).slice(0, 80) + '). Here is what I found so far.', 6000);
   const hasDelete = S.plan.items.some((i) => i.kind === 'DELETE');
   if (S.level === 2 || (S.level === 1 && !hasDelete)) return applyPlan(S.plan.items.map((i) => i.id));
   renderPlan(); go('plan');
@@ -430,6 +433,7 @@ async function boot() {
   bindSetup(); bindProgress(); bindHome(); bindPlan(); bindRules(); bindDone(); bindTrash();
   renderRules();
   const st = await call('init');
+  S.provider = st.provider || '';
   if (!st.hasKey) go('setup'); else { await waitForStorage(); await runScan(); }
 }
 boot().catch((e) => { document.body.textContent = 'Tidyo failed to start: ' + e.message; });
