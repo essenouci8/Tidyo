@@ -84,6 +84,8 @@ Omit an item if you cannot tell what it is. Do not invent details such as places
         var doneCalls = 0
         var processed = 0
         var partial: String? = null
+        var lastErr: LlmException? = null
+        val dupCount = items.size
         val totalFiles = nameOnly.size + vision.size
         fun tick() {
             emit(
@@ -104,8 +106,14 @@ Omit an item if you cannot tell what it is. Do not invent details such as places
             val text = try {
                 llm.generate(sys1, JSONArray().put(JSONObject().put("text", sb.toString())))
             } catch (e: LlmException) {
-                if (e.kind == LlmException.Kind.BAD_KEY || items.isEmpty()) throw e
-                partial = e.message; break
+                when (e.kind) {
+                    LlmException.Kind.BAD_KEY, LlmException.Kind.NETWORK -> throw e
+                    LlmException.Kind.QUOTA -> {
+                        if (items.size == dupCount) throw e
+                        partial = e.message; break
+                    }
+                    else -> { lastErr = e; processed += b.size; doneCalls++; tick(); continue }
+                }
             }
             val arr = Llm.parseJson(text)?.optJSONArray("actions")
             if (arr != null) for (i in 0 until arr.length()) {
@@ -150,6 +158,7 @@ Omit an item if you cannot tell what it is. Do not invent details such as places
             processed += b.size; doneCalls++; tick()
         }
 
+        if (items.size == dupCount && lastErr != null) throw lastErr!!
         current = items.values.toList()
         planId = (planId + 1)
         return planJson().put("partial", partial ?: JSONObject.NULL)

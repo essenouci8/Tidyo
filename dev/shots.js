@@ -7,6 +7,7 @@ const { chromium } = require('playwright');
   const errs = []; p.on('pageerror', (e) => errs.push('pageerror ' + e.message)); p.on('console', (m) => { if (m.type() === 'error') errs.push('console ' + m.text()); });
   const out = process.argv[2];
   const shot = (n) => p.screenshot({ path: `${out}/${n}.png` });
+  await p.addInitScript(() => { const st = document.createElement('style'); st.textContent = '[style*="Syne"], [style*="Syne"] * { letter-spacing: 0.07em !important; }'; document.addEventListener('DOMContentLoaded', () => document.head.appendChild(st)); });
   await p.goto('http://localhost:8765/index.html');
   await p.waitForSelector('#s-setup.active');
   await p.waitForTimeout(2600); await shot('01-setup');

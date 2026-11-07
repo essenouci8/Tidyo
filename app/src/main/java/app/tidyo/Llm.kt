@@ -232,12 +232,18 @@ class Llm(private val secrets: Secrets) {
                 r.code == 429 -> throw LlmException(LlmException.Kind.QUOTA, msg)
                 r.code == 401 || r.code == 403 -> throw LlmException(LlmException.Kind.BAD_KEY, msg)
                 r.code == 400 && p.api == Api.GEMINI && msg.contains("API key", true) -> throw LlmException(LlmException.Kind.BAD_KEY, msg)
-                r.code == 400 && p.api == Api.COMPAT && jsonMode && msg.contains("response_format", true) -> jsonMode = false
+                r.code == 400 && p.api == Api.COMPAT && jsonMode && (msg.contains("response_format", true) || msg.contains("json", true) || r.text.contains("failed_generation")) -> jsonMode = false
+                r.code == 400 && p.api == Api.COMPAT && failedGeneration(r.text).isNotEmpty() -> return failedGeneration(r.text)
                 r.code == 404 && attempt < 3 -> withContext(Dispatchers.IO) { validate(key) }
                 else -> throw LlmException(LlmException.Kind.OTHER, "HTTP ${r.code}: $msg")
             }
         }
     }
+
+    /** Groq and others return the model's malformed answer inside the error; we can often still read it. */
+    private fun failedGeneration(raw: String): String = try {
+        JSONObject(raw).optJSONObject("error")?.optString("failed_generation") ?: ""
+    } catch (e: Exception) { "" }
 
     private fun request(p: Provider, model: String, system: String, parts: JSONArray, temp: Double): Pair<String, String> {
         when (p.api) {

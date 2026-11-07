@@ -32,11 +32,25 @@ const call = (method, args = {}) => new Promise((res, rej) => {
 const NAMES = ['setup', 'scan', 'home', 'plan', 'rules', 'done', 'trash', 'log'];
 const BARS = { setup: ['#F1ECE1', false], scan: ['#2437E8', true], home: ['#F1ECE1', false], plan: ['#2437E8', true], rules: ['#F1ECE1', false], done: ['#FFD23F', false], trash: ['#F1ECE1', false], log: ['#F1ECE1', false] };
 let current = null;
+/* Syne ExtraBold is very wide: shrink headline groups so they never overflow their box. */
+function fit(root) {
+  const groups = {};
+  $$('[data-fit]', root).forEach((el) => { (groups[el.dataset.fit] = groups[el.dataset.fit] || []).push(el); });
+  Object.values(groups).forEach((list) => {
+    list.forEach((el) => { el.style.zoom = ''; el.style.whiteSpace = 'nowrap'; });
+    let s = 1;
+    list.forEach((el) => { const cw = el.clientWidth, sw = el.scrollWidth; if (cw > 0 && sw > cw + 1) s = Math.min(s, cw / sw); });
+    if (s < 1) list.forEach((el) => { el.style.zoom = (s * 0.98).toFixed(3); });
+  });
+}
+const fitCurrent = () => { if (current) fit($('#s-' + current)); };
+if (document.fonts) document.fonts.addEventListener('loadingdone', fitCurrent);
 function go(name) {
   $$('.screen').forEach((s) => s.classList.remove('active'));
   const el = $('#s-' + name);
   el.classList.add('active'); // display:none -> block restarts the entry animations
   current = name;
+  fit(el); setTimeout(fitCurrent, 400);
   const [bg, light] = BARS[name];
   call('bar', { bg, light }).catch(() => {});
 }
@@ -135,7 +149,7 @@ function setProgress(p, n, ofText, stickers) {
   const filled = Math.min(blocks.length, Math.floor(p * blocks.length));
   blocks.forEach((b, i) => { b.style.background = i < filled ? '#FFD23F' : '#2437E8'; });
   $('#scan-blocks').setAttribute('aria-label', Math.round(p * 100) + ' percent');
-  $('#scan-n').textContent = num(n);
+  const nt = num(n); if (nt.length !== $('#scan-n').textContent.length) { $('#scan-n').textContent = nt; fit($('#s-scan')); } else $('#scan-n').textContent = nt;
   $('#scan-of').textContent = ofText;
   if (stickers) stickers.forEach((t, i) => { $('#stk' + (i + 1)).textContent = t; });
   if (p > 0.04) {
@@ -315,6 +329,7 @@ function renderDone(r) {
   const mb = Math.round(r.freed / 1048576);
   countUp($('#done-a'), mb, 1200, 1600); countUp($('#done-b'), r.newFolders, 1300, 1600); countUp($('#done-c'), r.deleted, 1400, 1600);
   $('#done-until').textContent = r.until;
+  setTimeout(() => fit($('#s-done')), 2900);
   const labels = $$('#s-done .pop span:last-child'); if (labels[0]) labels[0].textContent = 'MB CLEARED';
   $('#btn-undo').disabled = false;
 }
@@ -432,6 +447,7 @@ async function boot() {
   $$('[data-nav]').forEach((b) => { b.onclick = () => nav(b.dataset.nav); });
   bindSetup(); bindProgress(); bindHome(); bindPlan(); bindRules(); bindDone(); bindTrash();
   renderRules();
+  if (document.fonts) await Promise.race([Promise.all(['800 40px Syne', '700 16px "Space Grotesk"', '700 12px "JetBrains Mono"'].map((f) => document.fonts.load(f))), sleep(2500)]).catch(() => {});
   const st = await call('init');
   S.provider = st.provider || '';
   if (!st.hasKey) go('setup'); else { await waitForStorage(); await runScan(); }
