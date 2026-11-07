@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scanning</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@property --n { syntax: '<integer>'; inherits: true; initial-value: 800; }
+@keyframes c800 {
+0% { --n: 0; }
+60%, 100% { --n: 800; }
+}
+@keyframes fillBlk {
+0%, 2% { background: #2437E8; }
+3%, 92% { background: #FFD23F; }
+96%, 100% { background: #2437E8; }
+}
+@keyframes chomp {
+0% { opacity: 0; transform: translateY(-70px) rotate(var(--r)); }
+14% { opacity: 1; }
+38%, 62% { opacity: 1; transform: translateY(0) rotate(var(--r)); }
+86% { opacity: 1; transform: translateY(var(--dy)) rotate(0deg) scale(.55, .22); }
+100% { opacity: 0; transform: translateY(var(--dy)) rotate(0deg) scale(.3, 0); }
+}
+@keyframes mouth {
+0%, 100% { transform: scaleY(1); }
+50% { transform: scaleY(2.2); }
+}
+@keyframes wob {
+from { transform: rotate(var(--a)); }
+to { transform: rotate(var(--b)); }
+}
+@keyframes blink {
+0%, 49% { opacity: 1; }
+50%, 100% { opacity: .15; }
+}
+.cnt { counter-reset: c var(--n); animation: c800 5s cubic-bezier(.2, .8, .3, 1) infinite; }
+.cnt::before { content: counter(c); }
+.blk { animation: fillBlk 5s steps(1, end) infinite; }
+.card { animation: chomp 3.6s ease-in-out infinite both; }
+.mouth { animation: mouth .9s ease-in-out infinite; }
+.wob { animation: wob 1.3s ease-in-out infinite alternate; }
+.blink { animation: blink 1s steps(1, end) infinite; }
+@media (prefers-reduced-motion: reduce) { .cnt, .blk, .card, .mouth, .wob, .blink { animation: none !important; } }
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #2437E8; font-family: 'Space Grotesk', sans-serif; color: #FFFFFF; padding: 52px 22px 26px; display: flex; flex-direction: column; gap: 18px; overflow: hidden">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; background: #0E0E0E; color: #FFD23F; padding: 7px 10px; border: 2px solid #0E0E0E"><span class="blink">●</span> SCANNING</div>
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: 0.08em">ETA 4 MIN</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<div class="cnt" role="img" aria-label="800 files read" style="font-family: 'Syne', sans-serif; font-weight: 800; font-size: 148px; line-height: 0.82; letter-spacing: -0.06em; color: #FFD23F"></div>
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; margin-top: 10px">of 1,284 files read</div>
+</div>
+<div role="img" aria-label="62 percent scanned" style="display: flex; gap: 4px">
+<div class="blk" style="flex: 1; height: 22px; background: #FFD23F; border: 2px solid #0E0E0E; animation-delay: 0s"></div>
+<div class="blk" style="flex: 1; height: 22px; background: #FFD23F; border: 2px solid #0E0E0E; animation-delay: .3s"></div>
+<div class="blk" style="flex: 1; height: 22px; background: #FFD23F; border: 2px solid #0E0E0E; animation-delay: .6s"></div>
+<div class="blk" style="flex: 1; height: 22px; background: #FFD23F; border: 2px solid #0E0E0E; animation-delay: .9s"></div>
+<div class="blk" style="flex: 1; height: 22px; background: #FFD23F; border: 2px solid #0E0E0E; animation-delay: 1.2s"></div>
+<div class="blk" style="flex: 1; height: 22px; background: #FFD23F; border: 2px solid #0E0E0E; animation-delay: 1.5s"></div>
+<div class="blk" style="flex: 1; height: 22px; background: #FFD23F; border: 2px solid #0E0E0E; animation-delay: 1.8s"></div>
+<div class="blk" style="flex: 1; height: 22px; background: #FFD23F; border: 2px solid #0E0E0E; animation-delay: 2.1s"></div>
+<div style="flex: 1; height: 22px; background: #2437E8; border: 2px solid #0E0E0E"></div>
+<div style="flex: 1; height: 22px; background: #2437E8; border: 2px solid #0E0E0E"></div>
+<div style="flex: 1; height: 22px; background: #2437E8; border: 2px solid #0E0E0E"></div>
+<div style="flex: 1; height: 22px; background: #2437E8; border: 2px solid #0E0E0E"></div>
+</div>
+<div style="position: relative; height: 252px">
+<div class="card" style="--r: -6deg; --dy: 214px; animation-delay: 0s; position: absolute; left: 4px; top: 0; box-sizing: border-box; width: 200px; background: #FFFFFF; color: #0E0E0E; border: 3px solid #0E0E0E; box-shadow: 4px 4px 0 #0E0E0E; padding: 8px 10px; transform: rotate(-6deg); font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700">IMG_20260412_0933.jpg</div>
+<div class="card" style="--r: 5deg; --dy: 180px; animation-delay: .9s; position: absolute; left: 206px; top: 34px; box-sizing: border-box; width: 130px; background: #FFD23F; color: #0E0E0E; border: 3px solid #0E0E0E; box-shadow: 4px 4px 0 #0E0E0E; padding: 8px 10px; transform: rotate(5deg); font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700">scan0007.pdf</div>
+<div class="card" style="--r: 3deg; --dy: 126px; animation-delay: 1.8s; position: absolute; left: 40px; top: 88px; box-sizing: border-box; width: 224px; background: #FFFFFF; color: #0E0E0E; border: 3px solid #0E0E0E; box-shadow: 4px 4px 0 #0E0E0E; padding: 8px 10px; transform: rotate(3deg); font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700">Screenshot_2025-09-14.png</div>
+<div class="card" style="--r: -4deg; --dy: 74px; animation-delay: 2.7s; position: absolute; left: 150px; top: 140px; box-sizing: border-box; width: 180px; background: #FF4D2E; color: #0E0E0E; border: 3px solid #0E0E0E; box-shadow: 4px 4px 0 #0E0E0E; padding: 8px 10px; transform: rotate(-4deg); font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700">IMG_0933 (copy).jpg</div>
+<div style="position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; height: 40px; background: #0E0E0E; border: 3px solid #0E0E0E; display: flex; align-items: center; justify-content: center">
+<div class="mouth" style="width: 236px; height: 12px; background: #2437E8; border: 2px solid #FFD23F"></div>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<div class="wob" style="--a: -1.5deg; --b: 1deg; background: #FFFFFF; color: #0E0E0E; border: 3px solid #0E0E0E; padding: 6px 10px; font-weight: 700; font-size: 14px; transform: rotate(-1.5deg)">41 duplicates</div>
+<div class="wob" style="--a: 1.5deg; --b: -1deg; animation-delay: -.4s; background: #FFD23F; color: #0E0E0E; border: 3px solid #0E0E0E; padding: 6px 10px; font-weight: 700; font-size: 14px; transform: rotate(1.5deg)">28 old screenshots</div>
+<div class="wob" style="--a: -1deg; --b: 1.5deg; animation-delay: -.8s; background: #FF4D2E; color: #0E0E0E; border: 3px solid #0E0E0E; padding: 6px 10px; font-weight: 700; font-size: 14px; transform: rotate(-1deg)">reading scans…</div>
+</div>
+<div style="font-size: 13px; line-height: 1.4; color: #FFFFFF">Paced to fit Gemini's free limit, so big folders take a few extra minutes.</div>
+<button type="button" style="margin-top: auto; height: 56px; border: 3px solid #0E0E0E; border-radius: 0; background: #F1ECE1; color: #0E0E0E; box-shadow: 5px 5px 0 #0E0E0E; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 20px; cursor: pointer">pause scan</button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

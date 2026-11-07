@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mess map</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@keyframes inPop {
+0% { opacity: 0; transform: scale(.6) rotate(var(--r0, -10deg)); }
+7% { opacity: 1; transform: scale(1.1) rotate(var(--r1, 0deg)); }
+10%, 76% { opacity: 1; transform: scale(1) rotate(var(--r1, 0deg)); }
+82%, 100% { opacity: 0; transform: scale(.85) rotate(var(--r1, 0deg)); }
+}
+@keyframes inRise {
+0% { opacity: 0; transform: translateY(26px); }
+8%, 76% { opacity: 1; transform: translateY(0); }
+82%, 100% { opacity: 0; transform: translateY(-14px); }
+}
+@keyframes inSlam {
+0% { opacity: 0; transform: scale(2.2) rotate(var(--r0, -16deg)); }
+4% { opacity: 1; transform: scale(.92) rotate(var(--r1, 0deg)); }
+6% { transform: scale(1.04) rotate(var(--r1, 0deg)); }
+8%, 76% { opacity: 1; transform: scale(1) rotate(var(--r1, 0deg)); }
+82%, 100% { opacity: 0; transform: scale(.85) rotate(var(--r1, 0deg)); }
+}
+@keyframes hlmove {
+0%, 30% { transform: translateX(100%); }
+36%, 60% { transform: translateX(200%); }
+66%, 100% { transform: translateX(100%); }
+}
+@keyframes pulse {
+0%, 100% { transform: scale(1); }
+50% { transform: scale(1.3); }
+}
+@keyframes nudge {
+0%, 100% { transform: translateX(0); }
+50% { transform: translateX(6px); }
+}
+.pop { animation: inPop 9s cubic-bezier(.25, 1.3, .4, 1) infinite both; }
+.rise { animation: inRise 9s cubic-bezier(.2, .9, .3, 1) infinite both; }
+.slam { animation: inSlam 9s cubic-bezier(.3, 1.2, .4, 1) infinite both; }
+.hl { animation: hlmove 9s cubic-bezier(.3, 1.3, .5, 1) infinite; }
+.pulse { display: inline-flex; animation: pulse 1.6s ease-in-out infinite; }
+.nudge { animation: nudge 1s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .pop, .rise, .slam, .hl, .pulse, .nudge { animation: none !important; } }
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F1ECE1; font-family: 'Space Grotesk', sans-serif; color: #0E0E0E; padding: 48px 22px 20px; display: flex; flex-direction: column; gap: 14px; overflow: hidden">
+<div class="rise" style="display: flex; align-items: center; justify-content: space-between">
+<div style="display: flex; align-items: center; gap: 10px">
+<svg width="40" height="40" viewBox="0 0 120 120" role="img" aria-label="Tidyo">
+<rect width="120" height="120" rx="28" fill="#2437E8"></rect>
+<rect x="34" y="24" width="56" height="72" rx="9" fill="#FF4D2E" stroke="#0E0E0E" stroke-width="4" transform="rotate(10 62 60)"></rect>
+<g transform="rotate(-6 56 60)">
+<path d="M32 22 H66 L88 44 V92 a8 8 0 0 1 -8 8 H32 a8 8 0 0 1 -8 -8 V30 a8 8 0 0 1 8 -8 Z" fill="#FFD23F" stroke="#0E0E0E" stroke-width="4" stroke-linejoin="round"></path>
+<path d="M66 22 V38 a6 6 0 0 0 6 6 H88" fill="none" stroke="#0E0E0E" stroke-width="4" stroke-linejoin="round"></path>
+<path d="M38 68 L51 81 L74 55" fill="none" stroke="#0E0E0E" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"></path>
+</g>
+</svg>
+<span style="font-family: 'Syne', sans-serif; font-weight: 800; font-size: 28px; letter-spacing: -0.04em">tidyo</span>
+</div>
+<button type="button" aria-label="Settings" style="width: 44px; height: 44px; border: 3px solid #0E0E0E; border-radius: 0; background: #FFFFFF; color: #0E0E0E; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 3px 3px 0 #0E0E0E">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-bottom: 8px">
+<span class="rise" style="animation-delay: .1s; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 46px; line-height: 1; letter-spacing: -0.045em">your phone is</span>
+<span class="slam" style="--r0: -16deg; --r1: -2deg; animation-delay: .35s; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 46px; line-height: 1; letter-spacing: -0.045em; background: #FF4D2E; border: 3px solid #0E0E0E; padding: 0 10px 4px; transform: rotate(-2deg); box-shadow: 4px 4px 0 #0E0E0E">73% mess.</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: repeat(3, 92px); gap: 8px">
+<div class="pop" style="--r0: 0deg; --r1: 0deg; animation-delay: .5s; grid-column: 1 / span 4; grid-row: 1 / span 2; background: #2437E8; color: #FFFFFF; border: 3px solid #0E0E0E; box-shadow: 4px 4px 0 #0E0E0E; padding: 10px 12px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box">
+<div style="font-weight: 700; font-size: 15px">Duplicate photos</div>
+<div>
+<div style="font-family: 'Syne', sans-serif; font-weight: 800; font-size: 64px; line-height: 0.85; letter-spacing: -0.05em; color: #FFD23F">280<span style="font-size: 24px; letter-spacing: -0.02em"> MB</span></div>
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; margin-top: 10px">41 FILES · SAFE TO DELETE</div>
+</div>
+</div>
+<div class="pop" style="--r0: 0deg; --r1: 0deg; animation-delay: .62s; grid-column: 5 / span 2; grid-row: 1; background: #FFD23F; border: 3px solid #0E0E0E; box-shadow: 4px 4px 0 #0E0E0E; padding: 8px 10px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box">
+<div style="font-weight: 700; font-size: 12px">Screenshots</div>
+<div style="display: flex; flex-direction: column">
+<span style="font-family: 'Syne', sans-serif; font-weight: 800; font-size: 32px; line-height: 0.95; letter-spacing: -0.04em">190</span>
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700">MB</span>
+</div>
+</div>
+<div class="pop" style="--r0: 0deg; --r1: 0deg; animation-delay: .74s; grid-column: 5 / span 2; grid-row: 2; background: #FF4D2E; border: 3px solid #0E0E0E; box-shadow: 4px 4px 0 #0E0E0E; padding: 8px 10px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box">
+<div style="font-weight: 700; font-size: 12px">Chat files</div>
+<div style="display: flex; flex-direction: column">
+<span style="font-family: 'Syne', sans-serif; font-weight: 800; font-size: 32px; line-height: 0.95; letter-spacing: -0.04em">170</span>
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700">MB</span>
+</div>
+</div>
+<div class="pop" style="--r0: 0deg; --r1: 0deg; animation-delay: .86s; grid-column: 1 / span 3; grid-row: 3; background: #FFFFFF; border: 3px solid #0E0E0E; box-shadow: 4px 4px 0 #0E0E0E; padding: 8px 10px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box">
+<div style="font-weight: 700; font-size: 13px">Unsorted</div>
+<div style="font-family: 'Syne', sans-serif; font-weight: 800; font-size: 28px; line-height: 1; letter-spacing: -0.04em">340 files</div>
+</div>
+<div class="pop" style="--r0: 0deg; --r1: 0deg; animation-delay: .98s; grid-column: 4 / span 3; grid-row: 3; background: #0E0E0E; color: #FFD23F; border: 3px solid #0E0E0E; box-shadow: 4px 4px 0 #2437E8; padding: 8px 10px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box">
+<div style="font-weight: 700; font-size: 13px; color: #FFFFFF">Bad names</div>
+<div style="font-family: 'Syne', sans-serif; font-weight: 800; font-size: 28px; line-height: 1; letter-spacing: -0.04em">120 files</div>
+</div>
+</div>
+<label class="rise" style="animation-delay: 1.1s; display: flex; align-items: center; gap: 10px; height: 52px; box-sizing: border-box; border: 3px solid #0E0E0E; background: #FFFFFF; padding: 0 12px">
+<span style="position: absolute; left: -9999px">Ask your files</span>
+<span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 18px">&gt;</span>
+<input type="text" placeholder="ask: that contract from May" readonly="readonly" style="flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #0E0E0E">
+<span class="pulse">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0E0E0E" stroke-width="2.6" stroke-linecap="square" aria-hidden="true"><rect x="9" y="3" width="6" height="12"></rect><path d="M5 12a7 7 0 0 0 14 0M12 19v3"></path></svg>
+</span>
+</label>
+<div class="rise" role="group" aria-label="Autonomy" style="animation-delay: 1.2s; position: relative; display: flex; border: 3px solid #0E0E0E; background: #FFFFFF">
+<div class="hl" style="position: absolute; left: 0; top: 0; bottom: 0; width: 33.333%; background: #FFD23F; transform: translateX(100%)"></div>
+<button type="button" aria-pressed="false" style="position: relative; flex: 1; height: 46px; border: 0; border-right: 3px solid #0E0E0E; border-radius: 0; background: transparent; color: #0E0E0E; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; cursor: pointer">ASK ME</button>
+<button type="button" aria-pressed="true" style="position: relative; flex: 1; height: 46px; border: 0; border-right: 3px solid #0E0E0E; border-radius: 0; background: transparent; color: #0E0E0E; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; cursor: pointer">SMART</button>
+<button type="button" aria-pressed="false" style="position: relative; flex: 1; height: 46px; border: 0; border-radius: 0; background: transparent; color: #0E0E0E; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; cursor: pointer">FULL AUTO</button>
+</div>
+<button type="button" class="rise" style="animation-delay: 1.3s; height: 60px; border: 3px solid #0E0E0E; border-radius: 0; background: #0E0E0E; color: #FFD23F; box-shadow: 6px 6px 0 #2437E8; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer">
+<span>see the plan</span>
+<svg class="nudge" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"></path></svg>
+</button>
+<nav class="rise" aria-label="Main" style="animation-delay: 1.4s; margin-top: auto; display: flex; border: 3px solid #0E0E0E; background: #FFFFFF">
+<button type="button" aria-current="page" style="flex: 1; min-height: 48px; border: 0; border-right: 3px solid #0E0E0E; border-radius: 0; background: #0E0E0E; color: #FFFFFF; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; cursor: pointer">mess</button>
+<button type="button" style="flex: 1; min-height: 48px; border: 0; border-right: 3px solid #0E0E0E; border-radius: 0; background: #FFFFFF; color: #0E0E0E; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; cursor: pointer">rules</button>
+<button type="button" style="flex: 1; min-height: 48px; border: 0; border-right: 3px solid #0E0E0E; border-radius: 0; background: #FFFFFF; color: #0E0E0E; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; cursor: pointer">trash</button>
+<button type="button" style="flex: 1; min-height: 48px; border: 0; border-radius: 0; background: #FFFFFF; color: #0E0E0E; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; cursor: pointer">log</button>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

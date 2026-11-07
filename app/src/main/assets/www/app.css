@@ -1,0 +1,162 @@
+/* Tidyo — shared styles. Screen markup comes straight from the design files;
+   animations are the design's keyframes, played once on entry (ambient ones loop). */
+html, body { margin: 0; height: 100%; background: #F1ECE1; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Space Grotesk', sans-serif; }
+#app { position: fixed; inset: 0; }
+.screen { display: none; position: absolute; inset: 0; --d: 9s; }
+.screen.active { display: block; }
+#s-done { --d: 10s; }
+button { font: inherit; touch-action: manipulation; }
+button:not(:disabled):active { transform: translate(4px, 4px); }
+button:disabled { opacity: .6; }
+a { color: #0E0E0E; }
+a:hover { color: #2437E8; }
+input::placeholder, textarea::placeholder { color: #8d887c; opacity: 1; }
+input, textarea { -webkit-user-select: text; user-select: text; }
+:focus-visible { outline: 3px solid #FFD23F; outline-offset: 2px; }
+
+/* ---- shared entrance keyframes (the design's, minus the loop exit) ---- */
+@keyframes inPop {
+  0% { opacity: 0; transform: scale(.6) rotate(var(--r0, -10deg)); }
+  7% { opacity: 1; transform: scale(1.1) rotate(var(--r1, 0deg)); }
+  10%, 100% { opacity: 1; transform: scale(1) rotate(var(--r1, 0deg)); }
+}
+@keyframes inRise {
+  0% { opacity: 0; transform: translateY(26px); }
+  8%, 100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes inSlide {
+  0% { opacity: 0; transform: translateX(40px); }
+  8%, 100% { opacity: 1; transform: translateX(0); }
+}
+@keyframes inSlam {
+  0% { opacity: 0; transform: scale(2.2) rotate(var(--r0, -16deg)); }
+  4% { opacity: 1; transform: scale(.92) rotate(var(--r1, 0deg)); }
+  6% { transform: scale(1.04) rotate(var(--r1, 0deg)); }
+  8%, 100% { opacity: 1; transform: scale(1) rotate(var(--r1, 0deg)); }
+}
+.screen .pop { animation: inPop var(--d) cubic-bezier(.25, 1.3, .4, 1) 1 both; }
+.screen .rise { animation: inRise var(--d) cubic-bezier(.2, .9, .3, 1) 1 both; }
+.screen .slide { animation: inSlide var(--d) cubic-bezier(.2, .9, .3, 1) 1 both; }
+.screen .slam { animation: inSlam var(--d) cubic-bezier(.3, 1.2, .4, 1) 1 both; }
+
+/* ---- setup: error sticker + shake fire only on a failed key ---- */
+@keyframes errIn {
+  0% { opacity: 0; transform: scale(2.2) rotate(-16deg); }
+  22% { opacity: 1; transform: scale(.92) rotate(-2deg); }
+  34% { transform: scale(1.05) rotate(-2deg); }
+  50%, 100% { opacity: 1; transform: scale(1) rotate(-2deg); }
+}
+@keyframes shakeX {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(5px); }
+  90% { transform: translateX(-2px); }
+}
+#s-setup .err { display: none; }
+#s-setup.failed .err { display: block; animation: errIn .75s cubic-bezier(.3, 1.2, .4, 1) 1 both; }
+#s-setup.failed .shake { animation: shakeX .75s ease-in-out 1; }
+
+/* ---- scan: ambient loops straight from the design ---- */
+@keyframes chomp {
+  0% { opacity: 0; transform: translateY(-70px) rotate(var(--r)); }
+  14% { opacity: 1; }
+  38%, 62% { opacity: 1; transform: translateY(0) rotate(var(--r)); }
+  86% { opacity: 1; transform: translateY(var(--dy)) rotate(0deg) scale(.55, .22); }
+  100% { opacity: 0; transform: translateY(var(--dy)) rotate(0deg) scale(.3, 0); }
+}
+@keyframes mouth { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(2.2); } }
+@keyframes wob { from { transform: rotate(var(--a)); } to { transform: rotate(var(--b)); } }
+@keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: .15; } }
+#s-scan .card { animation: chomp 3.6s ease-in-out infinite both; }
+#s-scan .mouth { animation: mouth .9s ease-in-out infinite; }
+#s-scan .wob { animation: wob 1.3s ease-in-out infinite alternate; }
+#s-scan .blink { animation: blink 1s steps(1, end) infinite; }
+#s-scan #scan-blocks > div { transition: background .25s steps(1, end); }
+#s-scan.paused .card, #s-scan.paused .mouth, #s-scan.paused .blink { animation-play-state: paused; }
+
+/* ---- home ---- */
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+@keyframes nudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(6px); } }
+#s-home .pulse { display: inline-flex; animation: pulse 1.6s ease-in-out infinite; }
+#s-home .nudge { animation: nudge 1s ease-in-out infinite; }
+
+/* ---- plan: the receipt prints, the total counts, the button rises ---- */
+@keyframes printOut { from { transform: translateY(-104%); } to { transform: translateY(0); } }
+@keyframes btnIn { 0% { opacity: 0; transform: translateY(26px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes sweep { from { transform: translateX(0); } to { transform: translateX(171px); } }
+#s-plan .print { animation: printOut 2.16s steps(22, end) 1 both; }
+#s-plan .btnIn { animation: btnIn .72s cubic-bezier(.2, .9, .3, 1) 2s 1 both; }
+#s-plan .sweep { animation: sweep 1.8s linear infinite alternate; }
+
+/* ---- rules ---- */
+@keyframes heardIn { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes chipPop { 0% { opacity: 0; transform: scale(.4); } 60% { opacity: 1; transform: scale(1.18); } 100% { opacity: 1; transform: scale(1); } }
+#heard { display: none !important; }
+#heard.on { display: flex !important; animation: heardIn .5s cubic-bezier(.2, .9, .3, 1) 1 both; }
+#heard .chip { display: inline-block; white-space: nowrap; border: 2px solid #0E0E0E; padding: 2px 8px; font-weight: 700; color: #0E0E0E; animation: chipPop .35s cubic-bezier(.3, 1.3, .5, 1) 1 both; }
+.rule-row { animation: inRise .8s cubic-bezier(.2, .9, .3, 1) 1 both; }
+
+/* ---- done ---- */
+@keyframes letterDrop {
+  0% { opacity: 0; transform: translateY(-140px) rotate(var(--lr)); }
+  5% { opacity: 1; transform: translateY(8px) rotate(0deg); }
+  7% { transform: translateY(-5px) rotate(0deg); }
+  9%, 100% { opacity: 1; transform: translateY(0) rotate(0deg); }
+}
+@keyframes quake {
+  0%, 13% { transform: translate(0, 0); }
+  14% { transform: translate(4px, -4px); }
+  15% { transform: translate(-4px, 3px); }
+  16% { transform: translate(3px, -2px); }
+  17%, 100% { transform: translate(0, 0); }
+}
+@keyframes burst {
+  0%, 13% { opacity: 0; transform: translate(0, 0) rotate(0deg) scale(.4); }
+  14% { opacity: 1; }
+  24% { opacity: 1; transform: translate(var(--x), var(--y)) rotate(var(--rot)) scale(1); }
+  34%, 100% { opacity: 0; transform: translate(var(--x), calc(var(--y) + 70px)) rotate(var(--rot)) scale(1); }
+}
+@keyframes flyAway {
+  0%, 34% { opacity: 1; transform: translate(0, 0) rotate(var(--r)) scale(1); }
+  42% { opacity: 1; transform: translate(70px, 0) rotate(0deg) scale(.6); }
+  46%, 100% { opacity: 0; transform: translate(70px, 0) rotate(0deg) scale(.4); }
+}
+@keyframes bump { 0%, 43% { transform: scale(1); } 46% { transform: scale(1.5); } 50%, 100% { transform: scale(1); } }
+@keyframes spinOnce { 0%, 55% { transform: rotate(0deg); } 64%, 100% { transform: rotate(-360deg); } }
+#s-done .ltr { display: inline-block; animation: letterDrop 10s cubic-bezier(.3, 1.2, .5, 1) 1 both; }
+#s-done .quake { animation: quake 10s linear 1; }
+#s-done .cf { position: absolute; left: -6px; top: -6px; width: 12px; height: 12px; box-sizing: border-box; border: 2px solid #0E0E0E; animation: burst 10s cubic-bezier(.2, .8, .4, 1) 1 both; }
+#s-done .fly { animation: flyAway 10s cubic-bezier(.5, 0, .7, 1) 1 both; }
+#s-done .bump { display: inline-block; animation: bump 10s ease-in-out 1; }
+#s-done .spin { animation: spinOnce 10s ease-in-out 1; }
+
+/* ---- overlays (modal, settings, search) ---- */
+.overlay { position: fixed; inset: 0; z-index: 50; display: none; align-items: center; justify-content: center; background: rgba(14,14,14,.55); padding: 22px; }
+.overlay.on { display: flex; }
+.sheet { width: 100%; max-width: 346px; box-sizing: border-box; background: #FFFFFF; border: 3px solid #0E0E0E; box-shadow: 6px 6px 0 #0E0E0E; padding: 16px; display: flex; flex-direction: column; gap: 12px; animation: inSlam .5s cubic-bezier(.3, 1.2, .4, 1) 1 both; color: #0E0E0E; }
+.sheet h2 { margin: 0; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 28px; letter-spacing: -0.03em; line-height: 1; }
+.sheet p { margin: 0; font-size: 15px; line-height: 1.4; }
+.btn { min-height: 48px; padding: 0 14px; border: 3px solid #0E0E0E; border-radius: 0; background: #FFD23F; color: #0E0E0E; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; cursor: pointer; }
+.btn.ghost { background: #FFFFFF; }
+.btn.dark { background: #0E0E0E; color: #FFD23F; }
+.btn.red { background: #FF4D2E; }
+.row { display: flex; gap: 8px; }
+.row > .btn { flex: 1; }
+.item { display: flex; align-items: center; gap: 10px; background: #FFFFFF; border: 3px solid #0E0E0E; padding: 6px 12px; min-height: 54px; box-sizing: border-box; }
+.item .t { flex: 1; min-width: 0; font-size: 15px; font-weight: 700; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; }
+.item .t small { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: #4A463E; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item button { min-height: 44px; border: 3px solid #0E0E0E; border-radius: 0; background: #FFD23F; color: #0E0E0E; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; padding: 0 10px; cursor: pointer; }
+.item .x { background: #FFFFFF; min-width: 44px; padding: 0; font-size: 18px; }
+.empty { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: #4A463E; padding: 8px 2px; }
+#toast { position: fixed; z-index: 60; left: 22px; right: 22px; bottom: 28px; display: none; background: #0E0E0E; color: #FFD23F; border: 3px solid #0E0E0E; padding: 10px 12px; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; }
+#toast.on { display: block; }
+
+@media (prefers-reduced-motion: reduce) {
+  .screen *, .sheet, #heard, #heard .chip, .rule-row { animation: none !important; }
+  #s-setup.failed .err { display: block; }
+  #s-done .cf { display: none; }
+  #s-plan .print, #s-plan .btnIn { opacity: 1; transform: none; }
+}

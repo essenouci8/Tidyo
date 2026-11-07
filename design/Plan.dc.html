@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Receipt</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@property --t { syntax: '<integer>'; inherits: true; initial-value: 545; }
+@keyframes inRise {
+0% { opacity: 0; transform: translateY(26px); }
+8%, 76% { opacity: 1; transform: translateY(0); }
+82%, 100% { opacity: 0; transform: translateY(-14px); }
+}
+@keyframes printOut {
+0% { transform: translateY(-104%); animation-timing-function: steps(22, end); }
+24%, 76% { transform: translateY(0); animation-timing-function: cubic-bezier(.6, 0, .9, .4); }
+84%, 100% { transform: translateY(-104%); }
+}
+@keyframes c545 {
+0%, 22% { --t: 0; }
+38%, 100% { --t: 545; }
+}
+@keyframes sweep {
+from { transform: translateX(0); }
+to { transform: translateX(171px); }
+}
+@keyframes btnIn {
+0%, 22% { opacity: 0; transform: translateY(26px); }
+30%, 76% { opacity: 1; transform: translateY(0); }
+82%, 100% { opacity: 0; transform: translateY(-14px); }
+}
+@keyframes pressAt {
+0%, 48% { transform: translate(0, 0); box-shadow: 6px 6px 0 var(--sh, #0E0E0E); }
+51% { transform: translate(5px, 5px); box-shadow: 1px 1px 0 var(--sh, #0E0E0E); }
+56%, 100% { transform: translate(0, 0); box-shadow: 6px 6px 0 var(--sh, #0E0E0E); }
+}
+.rise { animation: inRise 9s cubic-bezier(.2, .9, .3, 1) infinite both; }
+.print { animation: printOut 9s infinite; }
+.cnt545 { counter-reset: t var(--t); animation: c545 9s cubic-bezier(.2, .8, .3, 1) infinite; }
+.cnt545::before { content: counter(t); }
+.sweep { animation: sweep 1.8s linear infinite alternate; }
+.btnIn { animation: btnIn 9s cubic-bezier(.2, .9, .3, 1) infinite both; }
+.pressAt { animation: pressAt 9s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .rise, .print, .cnt545, .sweep, .btnIn, .pressAt { animation: none !important; } }
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #2437E8; font-family: 'JetBrains Mono', monospace; color: #0E0E0E; padding: 48px 22px 24px; display: flex; flex-direction: column; gap: 14px; overflow: hidden">
+<div class="rise" style="display: flex; align-items: center; justify-content: space-between">
+<button type="button" aria-label="Back" style="width: 44px; height: 44px; border: 3px solid #0E0E0E; border-radius: 0; background: #FFFFFF; color: #0E0E0E; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 3px 3px 0 #0E0E0E">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" aria-hidden="true"><path d="M20 12H5M11 6l-6 6 6 6"></path></svg>
+</button>
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: #FFFFFF">PLAN #0412 · NOT APPLIED YET</div>
+</div>
+<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div style="flex: none; height: 14px; background: #0E0E0E; border-bottom: 3px solid #FFD23F"></div>
+<div style="flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column">
+<div class="print" style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+<div style="height: 10px; background-color: #FFFFFF; background-image: linear-gradient(135deg, #2437E8 25%, transparent 25%), linear-gradient(225deg, #2437E8 25%, transparent 25%); background-size: 10px 10px; background-position: 0 0, 0 0; flex: none"></div>
+<div style="flex: 1; min-height: 0; background: #FFFFFF; padding: 4px 18px 8px; display: flex; flex-direction: column; gap: 10px; overflow: hidden">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center">
+<div style="font-family: 'Syne', sans-serif; font-weight: 800; font-size: 26px; letter-spacing: -0.03em">TIDYO CLEANUP CO.</div>
+<div style="font-size: 12px; color: #4A463E">NOV 05 2026 · 1,284 FILES READ</div>
+</div>
+<div style="border-top: 2px dashed #0E0E0E"></div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<label style="display: flex; align-items: center; gap: 10px; min-height: 40px; font-size: 15px; font-weight: 700">
+<input type="checkbox" checked="checked" style="width: 22px; height: 22px; accent-color: #2437E8; margin: 0">
+<span>MOVE</span>
+<span style="flex: 1; border-bottom: 2px dotted #0E0E0E; margin-bottom: 4px"></span>
+<span style="font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800">340</span>
+</label>
+<div style="padding-left: 32px; font-size: 12px; line-height: 1.5; color: #4A463E">42 invoices → Documents/Invoices<br>96 trip photos → Pictures/Istanbul</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<label style="display: flex; align-items: center; gap: 10px; min-height: 40px; font-size: 15px; font-weight: 700">
+<input type="checkbox" checked="checked" style="width: 22px; height: 22px; accent-color: #2437E8; margin: 0">
+<span>RENAME</span>
+<span style="flex: 1; border-bottom: 2px dotted #0E0E0E; margin-bottom: 4px"></span>
+<span style="font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800">120</span>
+</label>
+<div style="padding-left: 32px; font-size: 12px; line-height: 1.5; color: #4A463E"><span style="text-decoration: line-through">IMG_20260412_0933.jpg</span><br>→ Cafe terrace, Apr 12.jpg<br><span style="text-decoration: line-through">scan0007.pdf</span><br>→ Rent contract 2026.pdf</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<label style="display: flex; align-items: center; gap: 10px; min-height: 40px; font-size: 15px; font-weight: 700">
+<input type="checkbox" checked="checked" style="width: 22px; height: 22px; accent-color: #2437E8; margin: 0">
+<span>DELETE</span>
+<span style="flex: 1; border-bottom: 2px dotted #0E0E0E; margin-bottom: 4px"></span>
+<span style="font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800">85</span>
+</label>
+<div style="padding-left: 32px; font-size: 12px; line-height: 1.5; color: #4A463E">dupes + old screenshots · 640 MB<br>sits in trash 30 days first</div>
+</div>
+<div style="border-top: 2px dashed #0E0E0E"></div>
+<div style="display: flex; align-items: flex-end; justify-content: space-between">
+<div style="font-size: 13px; font-weight: 700">TOTAL CHANGES</div>
+<div class="cnt545" role="img" aria-label="545" style="font-family: 'Syne', sans-serif; font-weight: 800; font-size: 54px; line-height: 0.85; letter-spacing: -0.05em"></div>
+</div>
+<div style="position: relative; align-self: flex-start; margin-top: auto; height: 36px">
+<div style="display: flex; align-items: flex-end; gap: 2px; height: 36px" aria-hidden="true">
+<div style="width: 3px; height: 100%; background: #0E0E0E"></div><div style="width: 6px; height: 100%; background: #0E0E0E"></div><div style="width: 2px; height: 100%; background: #0E0E0E"></div><div style="width: 4px; height: 100%; background: #0E0E0E"></div><div style="width: 2px; height: 100%; background: #0E0E0E"></div><div style="width: 7px; height: 100%; background: #0E0E0E"></div><div style="width: 3px; height: 100%; background: #0E0E0E"></div><div style="width: 2px; height: 100%; background: #0E0E0E"></div><div style="width: 5px; height: 100%; background: #0E0E0E"></div><div style="width: 3px; height: 100%; background: #0E0E0E"></div><div style="width: 6px; height: 100%; background: #0E0E0E"></div><div style="width: 2px; height: 100%; background: #0E0E0E"></div><div style="width: 4px; height: 100%; background: #0E0E0E"></div><div style="width: 3px; height: 100%; background: #0E0E0E"></div><div style="width: 7px; height: 100%; background: #0E0E0E"></div><div style="width: 2px; height: 100%; background: #0E0E0E"></div><div style="width: 5px; height: 100%; background: #0E0E0E"></div><div style="width: 3px; height: 100%; background: #0E0E0E"></div><div style="width: 2px; height: 100%; background: #0E0E0E"></div><div style="width: 6px; height: 100%; background: #0E0E0E"></div><div style="width: 4px; height: 100%; background: #0E0E0E"></div><div style="width: 3px; height: 100%; background: #0E0E0E"></div><div style="width: 7px; height: 100%; background: #0E0E0E"></div><div style="width: 2px; height: 100%; background: #0E0E0E"></div><div style="width: 5px; height: 100%; background: #0E0E0E"></div><div style="width: 3px; height: 100%; background: #0E0E0E"></div><div style="width: 6px; height: 100%; background: #0E0E0E"></div><div style="width: 2px; height: 100%; background: #0E0E0E"></div><div style="width: 4px; height: 100%; background: #0E0E0E"></div><div style="width: 3px; height: 100%; background: #0E0E0E"></div>
+</div>
+<div class="sweep" aria-hidden="true" style="position: absolute; left: 0; top: -4px; bottom: -4px; width: 3px; background: #FF4D2E; box-shadow: 0 0 0 1px #0E0E0E"></div>
+</div>
+</div>
+<div style="height: 10px; background-color: #FFFFFF; background-image: linear-gradient(315deg, #2437E8 25%, transparent 25%), linear-gradient(45deg, #2437E8 25%, transparent 25%); background-size: 10px 10px; background-position: 0 0, 0 0; flex: none"></div>
+</div>
+</div>
+</div>
+<div class="btnIn">
+<button type="button" class="pressAt" style="--sh: #0E0E0E; width: 100%; height: 62px; border: 3px solid #0E0E0E; border-radius: 0; background: #FFD23F; color: #0E0E0E; box-shadow: 6px 6px 0 #0E0E0E; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; cursor: pointer">apply 545 changes</button>
+</div>
+<div class="btnIn" style="font-size: 12px; font-weight: 700; text-align: center; color: #FFFFFF; letter-spacing: 0.04em">UNDO ANYTHING FOR 30 DAYS</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

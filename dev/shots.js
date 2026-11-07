@@ -1,0 +1,27 @@
+const { chromium } = require('playwright');
+(async () => {
+  const b = await chromium.launch();
+  const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
+  await ctx.addInitScript({ path: __dirname + '/mock.js' });
+  const p = await ctx.newPage();
+  const errs = []; p.on('pageerror', (e) => errs.push('pageerror ' + e.message)); p.on('console', (m) => { if (m.type() === 'error') errs.push('console ' + m.text()); });
+  const out = process.argv[2];
+  const shot = (n) => p.screenshot({ path: `${out}/${n}.png` });
+  await p.goto('http://localhost:8765/index.html');
+  await p.waitForSelector('#s-setup.active');
+  await p.waitForTimeout(2600); await shot('01-setup');
+  await p.fill('#key', 'nope'); await p.click('#btn-check'); await p.waitForTimeout(1300); await shot('02-setup-fail');
+  await p.fill('#key', 'AIzaGoodKey'); await p.click('#btn-check');
+  await p.waitForSelector('#s-scan.active'); await p.waitForTimeout(900); await shot('03-scan');
+  await p.waitForSelector('#s-home.active'); await p.waitForTimeout(2600); await shot('04-home');
+  await p.click('[data-lv="0"]'); await p.waitForTimeout(500); await p.click('#btn-plan');
+  await p.waitForSelector('#s-scan.active'); await p.waitForTimeout(900); await shot('05-thinking');
+  await p.waitForSelector('#s-plan.active'); await p.waitForTimeout(1200); await shot('06-plan-printing'); await p.waitForTimeout(3500); await shot('07-plan');
+  await p.click('#btn-apply'); await p.waitForSelector('#s-done.active'); await p.waitForTimeout(1400); await shot('08-done-a'); await p.waitForTimeout(2000); await shot('09-done-b'); await p.waitForTimeout(3500); await shot('10-done-c');
+  await p.evaluate(() => nav('rules')); await p.waitForTimeout(1500); await shot('11-rules');
+  await p.fill('#rule-in', 'pdfs about electricity go to bills, named by month'); await p.click('#btn-teach'); await p.waitForTimeout(2400); await shot('12-rules-heard');
+  await p.evaluate(() => nav('trash')); await p.waitForTimeout(1500); await shot('13-trash');
+  await p.evaluate(() => nav('log')); await p.waitForTimeout(1500); await shot('14-log');
+  console.log(errs.join('\n') || 'no errors');
+  await b.close();
+})();

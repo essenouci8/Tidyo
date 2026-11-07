@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tidyo</title>
+<meta name="viewport" content="width=390, initial-scale=1, user-scalable=no">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div id="app"></div>
+
+<div class="overlay" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-t">
+  <div class="sheet">
+    <h2 id="modal-t"></h2>
+    <p id="modal-p"></p>
+    <div class="row"><button class="btn ghost" id="modal-no" type="button"></button><button class="btn" id="modal-yes" type="button"></button></div>
+  </div>
+</div>
+
+<div class="overlay" id="settings" role="dialog" aria-modal="true" aria-labelledby="set-t">
+  <div class="sheet">
+    <h2 id="set-t">settings.</h2>
+    <p>Tidyo thinks with your own Gemini key. It is stored encrypted on this phone.</p>
+    <button class="btn" id="set-key" type="button">change API key</button>
+    <p style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700">Trash keeps deleted files for 30 days. Version 1.0.0</p>
+    <button class="btn ghost" id="set-close" type="button">close</button>
+  </div>
+</div>
+
+<div class="overlay" id="search" role="dialog" aria-modal="true" aria-labelledby="sr-t">
+  <div class="sheet" style="max-height: 80%;">
+    <h2 id="sr-t">found.</h2>
+    <div id="sr-list" style="display:flex;flex-direction:column;gap:8px;overflow:auto;min-height:0"></div>
+    <button class="btn ghost" id="sr-close" type="button">close</button>
+  </div>
+</div>
+
+<div id="toast" role="status"></div>
+<script src="app.js"></script>
+</body>
+</html>
